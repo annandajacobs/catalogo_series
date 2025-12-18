@@ -6,13 +6,16 @@ import java.util.OptionalDouble;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 
@@ -39,8 +42,10 @@ public class Serie {
 
     private String sinopse;
 
-    @Transient
-    private List<Episodio> Episodios = new ArrayList<>();
+    @OneToMany(mappedBy = "serie", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    private List<Episodio> episodios = new ArrayList<>();
+
+    public Serie() {}
 
     public Serie(DadosSerie dadosSerie){
         this.titulo = dadosSerie.titulo();
@@ -57,6 +62,15 @@ public class Serie {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public List<Episodio> getEpisodios() {
+        return episodios;
+    }
+
+    public void setEpisodios(List<Episodio> episodios) {
+        episodios.forEach(e -> e.setSerie(this));
+        this.episodios = episodios;
     }
 
     public String getTitulo() {
@@ -122,7 +136,8 @@ public class Serie {
         ", titulo=" + titulo + 
         ",  totalTemporadas=" +     totalTemporadas + 
         ", avaliacao=" + avaliacao
-                +  ", atores=" + atores + ", poster=" + poster + ", sinopse=" + sinopse;
+                +  ", atores=" + atores + ", poster=" + poster + ", sinopse=" + sinopse
+                + ", episodios=" + episodios;
     }
     
 }
